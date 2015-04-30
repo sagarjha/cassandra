@@ -1,0 +1,33 @@
+\documentclass {article}
+
+\title {CS 451 Project \\Implementation of Cassandra}
+\author {Sagar Jha - 110100024\\ Rohan Gyani - 110040001}
+
+\begin{document}
+\maketitle
+
+We describe the functionality of the Cassandra system and indicate the subsets of feature we will implement, along with.
+
+There are four modules that make up the Cassandra process on a single machine : Partitioning module, cluster membership, failure detection module and storage engine module.
+
+Event driven substrate SEDA architecture
+
+Data Model :
+key value. value highly structured. atomic operation under a single row key. columns are grouped under column families. columns time sorted or name sorted.
+
+API :
+insert, get and delete
+
+Partitioning :
+Consistent hashing (similar to Chord's)
+
+Replication :
+Coordinator manages replication. Options are Rack Unaware, Rack Aware and Datacenter Aware. We implement Rack Unaware. Replication factor is N, then the N-1 nodes next to coordinator hold the replicas.
+
+Read/Write Requests : 
+1. Identify the node(s) that own the data for the key
+2. Route the requests to the nodes and wait on the responses to arrive
+3. If timeout, fail the request and return to client
+4. Schedule a repair of the data at any replica if needed
+ Features - Implement Asynchronous writes, Synchronous writes (Optional)
+\end{document}
