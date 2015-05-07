@@ -1,33 +1,48 @@
 \documentclass {article}
 
 \title {CS 451 Project \\Implementation of Cassandra}
-\author {Sagar Jha - 110100024\\ Rohan Gyani - 110040001}
+\author {Sagar Jha - 110100024\\ Rohan Gyani - 110040001 \\ Abhishek Gupta - 110040067}
 
 \begin{document}
 \maketitle
 
-We describe the functionality of the Cassandra system and indicate the subsets of feature we will implement, along with.
+\section {Problem Description}
+We implement a key value store with two operations : insert and get.
 
-There are four modules that make up the Cassandra process on a single machine : Partitioning module, cluster membership, failure detection module and storage engine module.
+Insert : Takes as input table name, key and value. Value is in the form supercolumn : column, where we identify supercolumns as a group of columns.
+Get : Takes as input table name, key and supercolumn name. Returns the set of values (the columns)
 
-Event driven substrate SEDA architecture
+We also implement a messaging application that makes use of the cassandra system to store messages. It offers two functionalities other than send.
 
-Data Model :
-key value. value highly structured. atomic operation under a single row key. columns are grouped under column families. columns time sorted or name sorted.
+Term Search : Search for a keyword. Returns all messages that contains the keyword in time-sorted order.
 
-API :
-insert, get and delete
+Interaction Search : Search for interactions with a user. Returns all messages that were sent to this user in time-sorted order.
 
-Partitioning :
-Consistent hashing (similar to Chord's)
+We use the messaging application for performance and scalability testing.
 
-Replication :
-Coordinator manages replication. Options are Rack Unaware, Rack Aware and Datacenter Aware. We implement Rack Unaware. Replication factor is N, then the N-1 nodes next to coordinator hold the replicas.
+Performance Testing : Populate the table with messages and then compute the average time taken for insert and get.
 
-Read/Write Requests : 
-1. Identify the node(s) that own the data for the key
-2. Route the requests to the nodes and wait on the responses to arrive
-3. If timeout, fail the request and return to client
-4. Schedule a repair of the data at any replica if needed
- Features - Implement Asynchronous writes, Synchronous writes (Optional)
+Scalability Testing : We control the number of users and the amount of interactions between them and check the variability in average times for insert and get.
+
+\section {System Design}
+Storage at servers : For a given table, key and supercolumn, we have a unique file on disc, path of which is <table>/<key>/<supercolumn>. Each such file stores all the values. We write sequentially to the file and hence the data is sorted by time of write.
+
+We store the records in memory till a certain number of records before flushing to disc.
+
+On disc the format for storage is $<column-name> <size> <column-name> <size> ...$
+
+In memory, the data structure is an arrayList of keys and for every key, we have a map of supercolumns with the list of columns.
+
+Key-space partitioning : Chord's algorithm is used for partitioning and replication. If a key falls into the domain of a certain node, that node is called the coordinator of the key. If $k$ is the replication factor, the coordinator is responsible for storing it in its $k-1$ successors.
+
+On an insert, we first direct the operation to the coordinator of the key. The coordinator sends insert commands to all the $k-1$ successors also. We perform synchronous writes and acknowledgement is send only after all the $k$ replicas are stored.
+
+On a get, we check if the node is one of the holders of the key. If not, then we direct the operation to the coordinator of the node. So, a get operation uses only one of the nodes that has the data.
+
+\section {Environment for execution}
+We require JVM. We use RMI heavily for communication. We will test the system on Linux Ubuntu.
+
+\section {Performance and Scalability (Optional)}
+This is just as desribed in the first section. We are not sure, if we will be able to perfomance these tests.
+
 \end{document}

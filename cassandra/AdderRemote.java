@@ -103,7 +103,7 @@ public int send(String username, String msg, String username2)
 
     public void getStub () throws RemoteException{
 	try {
-	    stub = (Server) Naming.lookup("rmi://localhost:5000/cassandra");
+	    stub = (Server) Naming.lookup("rmi://localhost:5000/1");
 	}
 	catch (Exception e) {
 	    System.out.println (e);

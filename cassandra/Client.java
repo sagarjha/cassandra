@@ -65,27 +65,36 @@ public class Client{
 		    if(choice==1)
 			{
 			    System.out.println("Enter the username of the person you want to chat with:");
+			    in.nextLine();
 			    username2=in.nextLine();
 			    System.out.println("Enter the message:");
 			    msg=in.nextLine();
 			    ret=stub.send(username, msg, username2);
+			    System.out.println ("username 2 = " + username2);
+			    System.out.println ("message is " + msg);
 			    if(ret<=0)	System.out.println("Message not sent successfully!");
 			    else System.out.println("Message delivered");
 			}
 		    else if(choice==2)
 			{
 			    System.out.println("Enter the username of the person you want to open chat history of:");
+			    in.nextLine();
 			    username2=in.nextLine();
 			    st=stub.search_chat(username, username2);
 			    if(st==null)	System.out.println("Operation Unsuccessful");
 			    else
 				{
 				    //Process the string
+				    for (String s : st) {
+					System.out.println (s);
+				    }
+				    
 				}
 			}
 		    else if(choice==3)
 			{
 			    System.out.println("Enter the keyword you want to search:");
+			    in.nextLine();
 			    msg=in.nextLine();
 			    st=stub.search_keyword(username, msg);
 			    if(st==null)	System.out.println("Operation Unsuccessful");
